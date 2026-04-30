@@ -1,0 +1,39 @@
+version: "3.8"
+
+services:
+  excel-mcp:
+    build: ../
+    image: excel-mcp-server:latest
+    container_name: excel-mcp-1
+    restart: always
+    ports:
+      - "3749:3749"
+    environment:
+      - PORT=3749
+      - OPENCODE_MODEL=opencode
+      - HISTORY_FILE=/data/history.json
+      - MAX_HISTORY=50
+    volumes:
+      - excel-mcp-data:/data
+    networks:
+      - excel-ai-network
+
+  excel-frontend:
+    image: nginx:alpine
+    container_name: excel-frontend-1
+    restart: always
+    ports:
+      - "3750:80"
+    volumes:
+      - ../taskpane:/usr/share/nginx/html:ro
+    depends_on:
+      - excel-mcp
+    networks:
+      - excel-ai-network
+
+volumes:
+  excel-mcp-data:
+
+networks:
+  excel-ai-network:
+    driver: bridge
